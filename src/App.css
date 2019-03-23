@@ -16,24 +16,28 @@
 .demo {
   display: flex;
   flex-direction: column;
+  padding: 30px;
+  border-radius: 10px;
+  margin: 10px;
 }
 
 input {
   margin: 10px;
 }
 
+.inputWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .withoutHooks {
   background-color: #0091cd;
-  padding: 30px;
-  border-radius: 10px;
-  margin: 10px;
 }
 
 .withHooks {
-  background-color: #bf033b;
-  padding: 30px;
-  border-radius: 10px;
-  margin: 10px;
+  background-color: orange;
 }
 
 .title {
