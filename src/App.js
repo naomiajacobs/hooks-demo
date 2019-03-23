@@ -1,24 +1,26 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
 
-import {NameWithHooks, NameWithoutHooks} from './Name';
+import { NameWithHooks, NameWithoutHooks } from "./Name";
 
-class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {hide: false}
-    }
-  render() {
-    return (
-      <div className="App">
-          <button type='checkbox' onClick={() => this.setState({hide: !this.state.hide})}>HIDE HOOKS</button>
-        <header className="App-header">
-          <NameWithoutHooks/>
-          {!this.state.hide && <NameWithHooks/>}
-        </header>
-      </div>
-    );
-  }
+function App() {
+  const [showHooks, setShowHooks] = useState(false);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <span className={"toggleHooks"}>
+          <button type="checkbox" onClick={() => setShowHooks(!showHooks)}>
+            {showHooks ? "HIDE HOOKS" : "SHOW HOOKS"}
+          </button>
+        </span>
+        <div className="hooks">
+          <NameWithoutHooks />
+          {showHooks && <NameWithHooks />}
+        </div>
+      </header>
+    </div>
+  );
 }
 
 export default App;

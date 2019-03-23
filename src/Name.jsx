@@ -41,7 +41,7 @@ export class NameWithoutHooks extends React.Component {
 
     render() {
         return <div className="demo withoutHooks">
-            <div className="title">WITHOUT HOOKS</div>
+            <div className="title">With Classes</div>
             <div>
                 Name:
                 <input value={this.state.name} onChange={this.updateName} />
@@ -86,7 +86,7 @@ export function NameWithHooks() {
     }, [name]);
 
     return <div className="demo withHooks">
-        <div className="title">WITH HOOKS</div>
+        <div className="title">With Hooks</div>
         <div>
             Name:
             <input {...name} />
