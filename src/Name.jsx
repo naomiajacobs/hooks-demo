@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import _ from "underscore";
 
 export class NameWithClass extends React.Component {
   state = {
@@ -53,7 +54,7 @@ export class NameWithClass extends React.Component {
 function useInputValue(initialValue) {
   const [value, setValue] = useState(initialValue);
   const onChange = e => setValue(e.target.value);
-  return {value, onChange};
+  return { value, onChange };
 }
 
 function useWindowWidth() {
@@ -66,12 +67,62 @@ function useWindowWidth() {
   return width;
 }
 
+function ToggleableInput(props) {
+  const inputProps = _.omit(props, "expandedInput");
+  return props.expandedInput ? (
+    <textarea rows="10" cols="60" {...inputProps} />
+  ) : (
+    <input {...inputProps} />
+  );
+}
+
+function useDepressedKeys() {
+  const [depressedKeys, setDepressedKeys] = useState(new Set([]));
+  console.log('depressed keys: ', depressedKeys);
+  const registerKeyDown = e => {
+    console.log('key down event');
+    setDepressedKeys(depressedKeys.add(e.key));
+  };
+  const registerKeyUp = e => {
+    depressedKeys.delete(e.key);
+    setDepressedKeys(depressedKeys);
+  };
+  useEffect(() => {
+    const listener = document.addEventListener("keydown", registerKeyDown);
+    return () => document.removeEventListener("keydown", listener);
+  }, []);
+  useEffect(() => {
+    const listener = document.addEventListener("keyup", registerKeyUp);
+    return () => document.removeEventListener("keyup", listener);
+  }, []);
+
+  return depressedKeys;
+}
+
+function useKeyboardShortcut(keys, callback) {
+  const depressedKeys = useDepressedKeys();
+  useEffect(() => {
+    if (keys.every(key => depressedKeys.has(key))) {
+      callback();
+    }
+  });
+}
+
 export function NameWithHooks() {
-  const name = useInputValue('Naomi');
+  const name = useInputValue("Naomi");
   useEffect(() => (document.title = name.value), [name.value]);
 
-  const favoriteColor = useInputValue('teal');
+  const favoriteColor = useInputValue("teal");
   const width = useWindowWidth();
+
+  const [expandedInput, setExpandedInput] = useState(true);
+
+  useKeyboardShortcut(["Control", "e"], () => {
+    if (!expandedInput) setExpandedInput(true);
+  });
+  useKeyboardShortcut(["Control", "c"], () => {
+    if (expandedInput) setExpandedInput(false);
+  });
 
   return (
     <div
@@ -81,11 +132,11 @@ export function NameWithHooks() {
       <div className="title">With Classes</div>
       <div className="inputWrapper">
         Name:
-        <input {...name} />
+        <ToggleableInput {...name} expandedInput={expandedInput} />
       </div>
       <div className="inputWrapper">
         Fave Color:
-        <input {...favoriteColor} />
+        <ToggleableInput {...favoriteColor} expandedInput={expandedInput} />
       </div>
       <div>Width: {width}</div>
     </div>
