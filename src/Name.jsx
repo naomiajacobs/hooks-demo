@@ -50,34 +50,42 @@ export class NameWithClass extends React.Component {
   }
 }
 
-export function NameWithHooks() {
-  const [name, setName] = useState("Naomi");
-  const updateName = e => setName(e.target.value);
-  useEffect(() => (document.title = name));
+function useInputValue(initialValue) {
+  const [value, setValue] = useState(initialValue);
+  const onChange = e => setValue(e.target.value);
+  return {value, onChange};
+}
 
-  const [favoriteColor, setFavoriteColor] = useState("teal");
-  const updateFavoriteColor = e => setFavoriteColor(e.target.value);
-
+function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);
   const handleResize = () => setWidth(window.innerWidth);
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []); // second parameter is optional, would be fine without it
+  return width;
+}
+
+export function NameWithHooks() {
+  const name = useInputValue('Naomi');
+  useEffect(() => (document.title = name.value));
+
+  const favoriteColor = useInputValue('teal');
+  const width = useWindowWidth();
 
   return (
     <div
       className="demo withHooks"
-      style={{ backgroundColor: favoriteColor }}
+      style={{ backgroundColor: favoriteColor.value }}
     >
       <div className="title">With Classes</div>
       <div className="inputWrapper">
         Name:
-        <input value={name} onChange={updateName} />
+        <input {...name} />
       </div>
       <div className="inputWrapper">
         Fave Color:
-        <input value={favoriteColor} onChange={updateFavoriteColor} />
+        <input {...favoriteColor} />
       </div>
       <div>Width: {width}</div>
     </div>
