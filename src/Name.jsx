@@ -76,53 +76,54 @@ function ToggleableInput(props) {
   );
 }
 
-function useDepressedKeys() {
-  const [depressedKeys, setDepressedKeys] = useState(new Set([]));
-  const registerKeyDown = e => {
-    if (!depressedKeys.has(e.key)) setDepressedKeys(depressedKeys.add(e.key));
-  };
-  const registerKeyUp = e => {
-    depressedKeys.delete(e.key);
-    setDepressedKeys(depressedKeys);
-  };
-  useEffect(() => {
-    const downListener = document.addEventListener("keydown", registerKeyDown);
-    const upListener = document.addEventListener("keyup", registerKeyUp);
-    return () => {
-      document.removeEventListener("keydown", downListener);
-      document.removeEventListener("keyup", upListener);
-    };
-  }, []);
-
-  return depressedKeys;
-}
-
 function useKeyboardShortcut(keys, callback) {
-  const depressedKeys = useDepressedKeys();
-  useEffect(() => {
-    if (
-      keys.length === depressedKeys.size &&
-      keys.every(key => depressedKeys.has(key))
-    ) {
-      callback();
-    }
-  });
+  const [depressedKeys, setDepressedKeys] = useState(new Set([]));
+  useEffect(
+    () => {
+      const registerKeyDown = e => {
+        if (!depressedKeys.has(e.key))
+          setDepressedKeys(depressedKeys.add(e.key));
+      };
+      const registerKeyUp = e => {
+        depressedKeys.delete(e.key);
+        setDepressedKeys(depressedKeys);
+      };
+      document.addEventListener("keydown", registerKeyDown);
+      document.addEventListener("keyup", registerKeyUp);
+      return () => {
+        document.removeEventListener("keydown", registerKeyDown);
+        document.removeEventListener("keyup", registerKeyUp);
+      };
+    },
+    [depressedKeys, setDepressedKeys]
+  );
+  if (
+    keys.length === depressedKeys.size &&
+    keys.every(key => depressedKeys.has(key))
+  ) {
+    callback();
+  }
 }
 
 export function NameWithHooks() {
   const name = useInputValue("Naomi");
-  useEffect(() => (document.title = name.value), [name.value]);
+  useEffect(
+    () => {
+      document.title = name.value;
+    },
+    [name.value]
+  );
 
   const favoriteColor = useInputValue("teal");
   const width = useWindowWidth();
 
   const [expandedInput, setExpandedInput] = useState(true);
 
-  useKeyboardShortcut(["Control", "e"], () => {
-    if (!expandedInput) setExpandedInput(true);
-  });
   useKeyboardShortcut(["Control", "c"], () => {
     if (expandedInput) setExpandedInput(false);
+  });
+  useKeyboardShortcut(["Control", "e"], () => {
+    if (!expandedInput) setExpandedInput(true);
   });
 
   return (
