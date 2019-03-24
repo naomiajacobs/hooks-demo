@@ -68,7 +68,7 @@ function useWindowWidth() {
 
 export function NameWithHooks() {
   const name = useInputValue('Naomi');
-  useEffect(() => (document.title = name.value));
+  useEffect(() => (document.title = name.value), [name.value]);
 
   const favoriteColor = useInputValue('teal');
   const width = useWindowWidth();
