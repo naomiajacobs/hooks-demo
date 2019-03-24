@@ -78,22 +78,20 @@ function ToggleableInput(props) {
 
 function useDepressedKeys() {
   const [depressedKeys, setDepressedKeys] = useState(new Set([]));
-  console.log('depressed keys: ', depressedKeys);
   const registerKeyDown = e => {
-    console.log('key down event');
-    setDepressedKeys(depressedKeys.add(e.key));
+    if (!depressedKeys.has(e.key)) setDepressedKeys(depressedKeys.add(e.key));
   };
   const registerKeyUp = e => {
     depressedKeys.delete(e.key);
     setDepressedKeys(depressedKeys);
   };
   useEffect(() => {
-    const listener = document.addEventListener("keydown", registerKeyDown);
-    return () => document.removeEventListener("keydown", listener);
-  }, []);
-  useEffect(() => {
-    const listener = document.addEventListener("keyup", registerKeyUp);
-    return () => document.removeEventListener("keyup", listener);
+    const downListener = document.addEventListener("keydown", registerKeyDown);
+    const upListener = document.addEventListener("keyup", registerKeyUp);
+    return () => {
+      document.removeEventListener("keydown", downListener);
+      document.removeEventListener("keyup", upListener);
+    };
   }, []);
 
   return depressedKeys;
@@ -102,7 +100,10 @@ function useDepressedKeys() {
 function useKeyboardShortcut(keys, callback) {
   const depressedKeys = useDepressedKeys();
   useEffect(() => {
-    if (keys.every(key => depressedKeys.has(key))) {
+    if (
+      keys.length === depressedKeys.size &&
+      keys.every(key => depressedKeys.has(key))
+    ) {
       callback();
     }
   });
