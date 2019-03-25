@@ -78,6 +78,7 @@ function ToggleableInput(props) {
 
 function useKeyboardShortcut(keys, callback) {
   const [depressedKeys, setDepressedKeys] = useState(new Set([]));
+  const [alreadyPressed, setAlreadyPressed] = useState(false);
   useEffect(
     () => {
       const registerKeyDown = e => {
@@ -87,6 +88,7 @@ function useKeyboardShortcut(keys, callback) {
       const registerKeyUp = e => {
         depressedKeys.delete(e.key);
         setDepressedKeys(depressedKeys);
+        setAlreadyPressed(false);
       };
       document.addEventListener("keydown", registerKeyDown);
       document.addEventListener("keyup", registerKeyUp);
@@ -95,14 +97,19 @@ function useKeyboardShortcut(keys, callback) {
         document.removeEventListener("keyup", registerKeyUp);
       };
     },
-    [depressedKeys, setDepressedKeys]
+    [depressedKeys]
   );
-  if (
-    keys.length === depressedKeys.size &&
-    keys.every(key => depressedKeys.has(key))
-  ) {
-    callback();
-  }
+
+  useEffect(() => {
+    if (
+      !alreadyPressed &&
+      keys.length === depressedKeys.size &&
+      keys.every(key => depressedKeys.has(key))
+    ) {
+      setAlreadyPressed(true);
+      callback();
+    }
+  });
 }
 
 export function NameWithHooks() {
@@ -119,12 +126,7 @@ export function NameWithHooks() {
 
   const [expandedInput, setExpandedInput] = useState(true);
 
-  useKeyboardShortcut(["Control", "c"], () => {
-    if (expandedInput) setExpandedInput(false);
-  });
-  useKeyboardShortcut(["Control", "e"], () => {
-    if (!expandedInput) setExpandedInput(true);
-  });
+  useKeyboardShortcut(["Control", "c"], () => setExpandedInput(!expandedInput));
 
   return (
     <div
