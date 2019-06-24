@@ -1,26 +1,32 @@
 import React, { useEffect, useState } from "react";
 
-function useToggle(initialState) {
-  const [bool, setBool] = useState(initialState);
-  return [bool, () => setBool(bool => !bool)];
-}
-
 function shortcutIsPressed(keys, depressedKeys) {
-  return depressedKeys.size === keys.length && 
-  keys.every(key => depressedKeys.has(key));
+  // Means it'll return for multiple ones at once
+  return keys.every(key => depressedKeys.has(key));
 }
 
-function useKeyBoardShortcut(keys, handler) {
+/**
+ * 
+ * @param {keys: Array<string>, handleOn: () => void, handleOff: () => void()} shortcuts 
+ */
+export function useKeyboardShortcuts(shortcuts) {
+
+}
+
+export default function useKeyboardShortcut(keys) {
   const depressedKeys = useDepressedKeys();
-  const [currentlyPressed, toggleCurrentlyPressed] = useToggle(shortcutIsPressed(keys, depressedKeys));
+  console.log('keys: ', depressedKeys);
+  const [currentlyPressed, setCurrentlyPressed] = useState(false);
   if (shortcutIsPressed(keys, depressedKeys)) {
     if (!currentlyPressed) {
-      handler();
-      toggleCurrentlyPressed();
+      setCurrentlyPressed(true);
     }
   } else {
-    toggleCurrentlyPressed();
+    if (currentlyPressed) {
+      setCurrentlyPressed(false);
+    }
   }
+  return currentlyPressed;
 }
 
 function useDepressedKeys() {
@@ -28,7 +34,7 @@ function useDepressedKeys() {
 
   useEffect(() => {
     const registerDown = e => {
-      if (!keys.has(e.key)) {
+      if (!e.repeat && !keys.has(e.key)) {
         setKeys(keys => {
           keys.add(e.key);
           return keys;
@@ -45,21 +51,15 @@ function useDepressedKeys() {
 
     document.addEventListener("keydown", registerDown);
     document.addEventListener("keyup", registerUp);
+    console.log('added listeners');
     return () => {
       // remove the event handlers
       document.removeEventListener("keydown", registerDown);
       document.removeEventListener("keyup", registerUp);
+      console.log('removed listeners');
     }
   }, []);
 
   return keys;
 }
 
-// Maybe a way to get singleton behavior and only set one global listener?
-let depressedKeys;
-
-function useDepressedKeysSingleton() {
-  if (depressedKeys) { return depressedKeys; }
-  depressedKeys = useDepressedKeys();
-  return depressedKeys;
-}

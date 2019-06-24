@@ -1,19 +1,17 @@
 import React from "react";
 import "./App.css";
 
-import { NameWithHooks, NameWithClass } from "./Name";
+import KeyboardShortcutDemo from './KeyboardShortcutDemo';
 
-function App() {
+export default function App() {
   return (
     <div className="App">
       <header className="App-header">
         <div className="hooks">
-          <NameWithClass />
-          <NameWithHooks />
+          <KeyboardShortcutDemo />
         </div>
       </header>
     </div>
   );
-}
 
-export default App;
+}
