@@ -1,4 +1,4 @@
-const indentation = '  ';
+const indentString = '  ';
 
 let numDescribes = 0;
 let numPasses = 0;
@@ -14,33 +14,35 @@ function report(description) {
     console.log(`${description} summary: ${numPasses} passed, ${numFails} failed`);
 }
 
-function run(description, test) {
-    console.log(description);
-    test();
+function endTest(description) {
     report(description);
     clearCounts();
 }
 
 function describe(description, test) {
     numDescribes++;
-    console.log(indentation.repeat(numDescribes) + description);
+    console.log(indentString.repeat(numDescribes) + description);
     test();
-    numDescribes--;
+    if (numDescribes > 1) {
+        numDescribes--;
+    } else {
+        endTest(description);
+    }
 }
 
 function pass(numIndentations) {
-    console.log(indentation.repeat(numIndentations + 1) + 'Pass');
+    console.log(indentString.repeat(numIndentations + 1) + 'Pass');
     numPasses++;
 }
 
 function fail(numIndentations) {
-    console.log(indentation.repeat(numIndentations + 1) + 'Fail');
+    console.log(indentString.repeat(numIndentations + 1) + 'Fail');
     numFails++;
 }
 
 function it(description, test) {
     const numIndentations = numDescribes + 1;
-    console.log(indentation.repeat(numIndentations) + description);
+    console.log(indentString.repeat(numIndentations) + description);
     try {
         test();
         pass(numIndentations);
@@ -64,7 +66,6 @@ function assertNotEqual(expression1, expression2) {
 }
 
 module.exports = { 
-    run,
     describe, 
     it, 
     assert, 
