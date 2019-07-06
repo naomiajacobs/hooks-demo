@@ -1,3 +1,5 @@
+const chalk = require('chalk');
+
 const indentString = '  ';
 
 let numDescribes = 0;
@@ -11,7 +13,7 @@ function clearCounts() {
 }
 
 function report(description) {
-    console.log(`${description} summary: ${numPasses} passed, ${numFails} failed`);
+    console.log(`${description} summary: ` + chalk.green(`${numPasses} passed`) + ',' + chalk.red(` ${numFails} failed`));
 }
 
 function endTest(description) {
@@ -31,12 +33,12 @@ function describe(description, test) {
 }
 
 function pass(numIndentations) {
-    console.log(indentString.repeat(numIndentations + 1) + 'Pass');
+    console.log(indentString.repeat(numIndentations + 1) + chalk.green('Pass'));
     numPasses++;
 }
 
 function fail(numIndentations) {
-    console.log(indentString.repeat(numIndentations + 1) + 'Fail');
+    console.log(indentString.repeat(numIndentations + 1) + chalk.red('Fail'));
     numFails++;
 }
 
